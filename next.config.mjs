@@ -11,7 +11,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3001", "*.vercel.app", "merchant.selfservice.io.vn"]
+      allowedOrigins: ["localhost:3001", "*.vercel.app", "sharkcredit.selfservice.io.vn"]
     }
   },
 }
