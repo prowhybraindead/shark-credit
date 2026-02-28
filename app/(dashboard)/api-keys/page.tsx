@@ -97,25 +97,26 @@ export default function ApiKeysPage() {
       <div className="glass rounded-2xl p-6 border border-white/10 space-y-4">
         <div className="flex items-center gap-3">
           <Code2 className="w-5 h-5 text-blue-400" />
-          <h2 className="font-semibold">Ví dụ tích hợp</h2>
+          <h2 className="font-semibold">Ví dụ tích hợp REST API</h2>
         </div>
         <pre className="bg-black/40 rounded-xl p-4 text-sm text-green-400 overflow-x-auto">
 {`// Tạo payment link từ server của bạn
-const response = await fetch("https://api.sharkcredit.vn/v1/links", {
+const response = await fetch("https://[DOMAIN]/api/[MERCHANT_ID]/[BILL_ID]", {
   method: "POST",
   headers: {
-    "Authorization": "Bearer YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_SECRET_KEY",
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
     amount: 150000,
     description: "Order #12345",
-    webhook_url: "https://your-site.com/webhook"
+    redirectUrl: "https://your-site.com/success",
+    webhookUrl: "https://your-site.com/webhook"
   })
 })
 
-const { linkId, qrCode } = await response.json()
-// Redirect user to: https://pay.sharkcredit.vn/\${linkId}`}
+const { checkoutUrl } = await response.json()
+// Redirect user to: checkoutUrl`}
         </pre>
       </div>
 
@@ -123,19 +124,34 @@ const { linkId, qrCode } = await response.json()
       <div className="glass rounded-2xl p-6 border border-white/10 space-y-4">
         <div className="flex items-center gap-3">
           <Webhook className="w-5 h-5 text-purple-400" />
-          <h2 className="font-semibold">Webhooks</h2>
-          <Badge variant="secondary">Sắp ra mắt</Badge>
+          <h2 className="font-semibold">Webhooks & Xác thực (HMAC)</h2>
+          <Badge variant="success">Hoạt động</Badge>
         </div>
         <p className="text-slate-400 text-sm">
-          Nhận thông báo tức thì khi có giao dịch mới. Webhook sẽ POST JSON payload đến URL của bạn.
+          Nhận thông báo tức thì khi có giao dịch mới. Webhook sẽ POST JSON payload đến <code>webhookUrl</code> của bạn.
+          Payload sẽ được ký bằng <b>HMAC-SHA256</b> với khóa bí mật và đính kèm trong header <code>X-Shark-Signature</code>.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {["payment.completed", "payment.failed", "refund.issued", "account.frozen"].map(event => (
-            <div key={event} className="bg-white/5 rounded-lg p-3 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-400" />
-              <code className="text-sm text-slate-300">{event}</code>
-            </div>
-          ))}
+        <div className="bg-black/40 rounded-xl p-4 mt-2">
+          <pre className="text-sm text-yellow-400 overflow-x-auto">
+{`// Payload Example
+{
+  "event": "payment_success",
+  "billId": "12345",
+  "merchantId": "MERCHANT_UID",
+  "transactionId": "...",
+  "amount": 150000,
+  "fee": 1500,
+  "netAmount": 148500,
+  "status": "PAID",
+  "timestamp": "2026-03-01T..."
+}`}
+          </pre>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+          <div className="bg-white/5 rounded-lg p-3 flex items-center gap-2 border border-emerald-500/20">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]" />
+            <code className="text-sm text-emerald-300">payment_success</code>
+          </div>
         </div>
       </div>
     </div>
